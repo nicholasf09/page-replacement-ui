@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Main Page</title>
+    <title>Calculate</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -11,74 +11,174 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/ScrollTrigger.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 </head>
 <body>
+    <script>
+        AOS.init();
+    </script>
     <div class="cards">
-        <svg 
-             viewBox="0 0 100% 100%"
-             xmlns='http://www.w3.org/2000/svg'
-             class="noise"
-             >
-          <filter id='noiseFilter'>
-            <feTurbulence 
-                          type='fractalNoise' 
-                          baseFrequency='0.85' 
-                          numOctaves='6' 
-                          stitchTiles='stitch' />
-          </filter>
-      
-          <rect
-                width='100%'
-                height='100%'
-                preserveAspectRatio="xMidYMid meet"
-                filter='url(#noiseFilter)' />
+        <svg viewBox="0 0 100% 100%" xmlns='http://www.w3.org/2000/svg' class="noise">
+            <filter id='noiseFilter'>
+                <feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='6' stitchTiles='stitch' />
+            </filter>
+            <rect width='100%' height='100%' preserveAspectRatio="xMidYMid meet" filter='url(#noiseFilter)' />
         </svg>
-        <div class="content">
-          <h1 class="fw-bold">Enter Reference String</h1>
-        <input type="text" class="form-control mt-3" placeholder="Type with no white space (Ex: 43214521)">
-        <p class="mt-4">Choose what algorithm you want to calculate with:</p>
-          <div class="d-flex  justify-content-center align-items-center">
-            <a href="calculate.html" class="buttons" style="margin: 0 10px; margin-bottom: 36px;">FIFO</a>
-            <a href="calculate.html" class="buttons" style="margin: 0 10px; margin-bottom: 36px;">Second Chance</a>
-          </div>
+        <div class="content forms" data-aos="zoom-in-up">
+            <div>
+                <h4 class="fw-bold">Enter Reference String</h4>
+                <input type="text" class="form-control mt-3" id="inputString" placeholder="Type with no white space (Ex: 43214521)">
+                <h4 class="fw-bold mt-3">Enter Frame Count</h4>
+                <input type="number" class="form-control mt-3" id="frameCount" placeholder="Recomended to use 3 or higher (Ex:3)">
+            </div>
+            <p class="mt-4">Choose what algorithm you want to calculate with:</p>
+            <div class="d-flex justify-content-center align-items-center">
+                <a href="#" onclick="FIFO();" class="buttons" style="margin: 0 10px; margin-bottom: 36px;">FIFO</a>
+                <a href="#" onclick="SecondChance();" class="buttons" style="margin: 0 10px; margin-bottom: 36px;">Second Chance</a>
+            </div>
         </div>
-      </div>
-      <div class="gradient-bg">
-        <svg 
-             viewBox="0 0 100vw 100vw"
-             xmlns='http://www.w3.org/2000/svg'
-             class="noiseBg"
-             >
-          <filter id='noiseFilterBg'>
-            <feTurbulence 
-                          type='fractalNoise'
-                          baseFrequency='0.6'
-                          stitchTiles='stitch' />
-          </filter>
-      
-          <rect
-                width='100%'
-                height='100%'
-                preserveAspectRatio="xMidYMid meet"
-                filter='url(#noiseFilterBg)' />
+    </div>
+    <div class="cards-answer" id="cards-answer">
+        <svg viewBox="0 0 100% 100%" xmlns='http://www.w3.org/2000/svg' class="noise">
+            <filter id='noiseFilter'>
+                <feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='6' stitchTiles='stitch' />
+            </filter>
+            <rect width='100%' height='100%' preserveAspectRatio="xMidYMid meet" filter='url(#noiseFilter)' />
+        </svg>
+        <div class="content outputs">
+            <div class="output-section">
+                <div id="output"></div>
+            </div>
+        </div>
+        <div id="anchor"></div>
+    </div>
+    <p class="text-center mt-4 credit">© 2024 Nicholas Fransisco</p>
+    <div class="gradient-bg">
+        <svg viewBox="0 0 100vw 100vw" xmlns='http://www.w3.org/2000/svg' class="noiseBg">
+            <filter id='noiseFilterBg'>
+                <feTurbulence type='fractalNoise' baseFrequency='0.6' stitchTiles='stitch' />
+            </filter>
+            <rect width='100%' height='100%' preserveAspectRatio="xMidYMid meet" filter='url(#noiseFilterBg)' />
         </svg>
         <svg xmlns="http://www.w3.org/2000/svg" class="svgBlur">
-          <defs>
-            <filter id="goo">
-              <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-              <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
-              <feBlend in="SourceGraphic" in2="goo" />
-            </filter>
-          </defs>
+            <defs>
+                <filter id="goo">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+                    <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8" result="goo" />
+                    <feBlend in="SourceGraphic" in2="goo" />
+                </filter>
+            </defs>
         </svg>
         <div class="gradients-container">
-          <div class="g1"></div>
-          <div class="g2"></div>
-          <div class="g3"></div>
-          <div class="g4"></div>
-          <div class="g5"></div>
-          <div class="interactive"></div>
+            <div class="g1"></div>
+            <div class="g2"></div>
+            <div class="g3"></div>
+            <div class="g4"></div>
+            <div class="g5"></div>
+            <div class="interactive"></div>
         </div>
-      </div>
+    </div>
+    <script>
+        function FIFO() {
+            const inputString = document.getElementById('inputString').value;
+            const frameCount = parseInt(document.getElementById('frameCount').value);
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '';
+
+            let frames = [];
+            let pageFaults = 0;
+
+            for (let i = 0; i < inputString.length; i++) {
+                const page = inputString[i];
+                const frameDivs = document.createElement('div');
+                frameDivs.setAttribute('data-aos', 'fade-left'); 
+                frameDivs.setAttribute('data-aos-delay', i * 200); 
+
+                if (!frames.includes(page)) {
+                    if (frames.length < frameCount) {
+                        frames.push(page);
+                    } else {
+                        frames.shift();
+                        frames.push(page);
+                    }
+                    pageFaults++;
+                    addFrameDivs(frameDivs, frames, 'miss');
+                } else {
+                    addFrameDivs(frameDivs, frames, 'hit');
+                }
+                outputDiv.appendChild(frameDivs);
+            }
+
+            document.getElementById("cards-answer").style.display = "block";
+            document.getElementById("anchor").scrollIntoView();
+
+            const resultDiv = document.createElement('div');
+            resultDiv.textContent = `Total Page Faults: ${pageFaults}`;
+            resultDiv.setAttribute('data-aos', 'fade-up'); 
+            outputDiv.appendChild(resultDiv);
+
+            AOS.refresh(); 
+        }
+
+        function SecondChance() {
+            const inputString = document.getElementById('inputString').value;
+            const frameCount = parseInt(document.getElementById('frameCount').value);
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '';
+
+            let frames = [];
+            let secondChance = [];
+            let pageFaults = 0;
+            let pointer = 0;
+
+            for (let i = 0; i < inputString.length; i++) {
+                const page = inputString[i];
+                const frameDivs = document.createElement('div');
+                frameDivs.setAttribute('data-aos', 'fade-left'); 
+                frameDivs.setAttribute('data-aos-delay', i * 200); 
+
+                if (!frames.includes(page)) {
+                    if (frames.length < frameCount) {
+                        frames.push(page);
+                        secondChance.push(0);
+                    } else {
+                        while (secondChance[pointer] === 1) {
+                            secondChance[pointer] = 0;
+                            pointer = (pointer + 1) % frameCount;
+                        }
+                        frames[pointer] = page;
+                        secondChance[pointer] = 0;
+                        pointer = (pointer + 1) % frameCount;
+                    }
+                    pageFaults++;
+                    addFrameDivs(frameDivs, frames, 'miss');
+                } else {
+                    secondChance[frames.indexOf(page)] = 1;
+                    addFrameDivs(frameDivs, frames, 'hit');
+                }
+                outputDiv.appendChild(frameDivs);
+            }
+
+            document.getElementById("cards-answer").style.display = "block";
+            document.getElementById("anchor").scrollIntoView();
+
+            const resultDiv = document.createElement('div');
+            resultDiv.textContent = `Total Page Faults: ${pageFaults}`;
+            resultDiv.setAttribute('data-aos', 'fade-up'); 
+            outputDiv.appendChild(resultDiv);
+
+            AOS.refresh();
+        }
+
+        function addFrameDivs(frameDivs, frames, status) {
+            frames.forEach(frame => {
+                const frameDiv = document.createElement('div');
+                frameDiv.className = `frame ${status}`;
+                frameDiv.textContent = frame;
+                frameDivs.appendChild(frameDiv);
+            });
+        }
+    </script>
 </body>
 </html>

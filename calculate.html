@@ -81,121 +81,137 @@
         </div>
     </div>
     <script>
-        function FIFO() {
-          document.getElementById("cards-answer").style.display = "block";
-            document.getElementById("answer-container").style.display = "block";
-            document.getElementById("anchor").scrollIntoView();
-    const inputString = document.getElementById('inputString').value;
-    const frameCount = parseInt(document.getElementById('frameCount').value);
-    const outputDiv = document.getElementById('output');
-    outputDiv.innerHTML = '';
+      function FIFO() {
+        // Show the answer container
+        document.getElementById("cards-answer").style.display = "block";
+        document.getElementById("answer-container").style.display = "block";
+        document.getElementById("anchor").scrollIntoView();
 
-    let frames = [];
-    let pageFaults = 0;
+        // Get the input values
+        const inputString = document.getElementById('inputString').value;
+        const frameCount = parseInt(document.getElementById('frameCount').value);
+        const outputDiv = document.getElementById('output');
+        outputDiv.innerHTML = '';
 
-    function processPage(i) {
-        if (i >= inputString.length) {
-            const resultDiv = document.createElement('div');
-            resultDiv.textContent = `Total Page Faults: ${pageFaults}`;
-            resultDiv.setAttribute('data-aos', 'fade-up');
-            outputDiv.appendChild(resultDiv);
-            AOS.refresh();
-            return;
-        }
+        let frames = [];
+        let pageFaults = 0;
 
-        const page = inputString[i];
-        const frameDivs = document.createElement('div');
-        frameDivs.setAttribute('data-aos', 'fade-left');
-        frameDivs.setAttribute('data-aos-delay', i * 200);
+        function processPage(i) {
 
-        const currentPageDiv = document.createElement('div');
-        currentPageDiv.className = 'current-page';
-        currentPageDiv.textContent = `Checking: ${page}`;
-        frameDivs.appendChild(currentPageDiv);
+          // If the calculate is done, show the result
+          if (i >= inputString.length) {
+              const resultDiv = document.createElement('div');
+              resultDiv.textContent = `Total Page Faults: ${pageFaults}`;
+              resultDiv.setAttribute('data-aos', 'fade-up');
+              outputDiv.appendChild(resultDiv);
+              AOS.refresh();
+              return;
+          }
 
-        if (!frames.includes(page)) {
-            if (frames.length < frameCount) {
-                frames.push(page);
-            } else {
-                frames.shift();
-                frames.push(page);
-            }
-            pageFaults++;
-            addFrameDivs(frameDivs, frames, 'miss');
-        } else {
-            addFrameDivs(frameDivs, frames, 'hit');
-        }
-        outputDiv.appendChild(frameDivs);
+          // Get the current frame div
+          const page = inputString[i];
+          const frameDivs = document.createElement('div');
+          frameDivs.setAttribute('data-aos', 'fade-left');
+          frameDivs.setAttribute('data-aos-delay', i * 200);
 
-        setTimeout(() => processPage(i + 1), 1000);
-    }
+          // Create the current page div
+          const currentPageDiv = document.createElement('div');
+          currentPageDiv.className = 'current-page';
+          currentPageDiv.textContent = `Checking: ${page}`;
+          frameDivs.appendChild(currentPageDiv);
+
+          // Check if the page is in the frames
+          if (!frames.includes(page)) {
+              if (frames.length < frameCount) { // If the frames are not full
+                  frames.push(page);
+              } else { // If the frames are full
+                  frames.shift();
+                  frames.push(page);
+              }
+              pageFaults++; // Increment the page faults
+              addFrameDivs(frameDivs, frames, 'miss'); // Add the frames to the output with miss status
+          } else {
+              addFrameDivs(frameDivs, frames, 'hit'); // Add the frames to the output with hit status
+          }
+          outputDiv.appendChild(frameDivs);
+
+          setTimeout(() => processPage(i + 1), 1000); // Process the next page
+       }
 
     processPage(0);
 }
 
 function SecondChance() {
+  
+  // Show the answer container
   document.getElementById("cards-answer").style.display = "block";
   document.getElementById("answer-container").style.display = "block";
   document.getElementById("anchor").scrollIntoView();
 
-    const inputString = document.getElementById('inputString').value;
-    const frameCount = parseInt(document.getElementById('frameCount').value);
-    const outputDiv = document.getElementById('output');
-    outputDiv.innerHTML = '';
+  // Get the input values
+  const inputString = document.getElementById('inputString').value;
+  const frameCount = parseInt(document.getElementById('frameCount').value);
+  const outputDiv = document.getElementById('output');
+  outputDiv.innerHTML = '';
 
-    let frames = [];
-    let secondChance = [];
-    let pageFaults = 0;
-    let pointer = 0;
+  let frames = [];
+  let secondChance = [];
+  let pageFaults = 0;
+  let pointer = 0;
 
-    function processPage(i) {
-        if (i >= inputString.length) {
-            const resultDiv = document.createElement('div');
-            resultDiv.textContent = `Total Page Faults: ${pageFaults}`;
-            resultDiv.setAttribute('data-aos', 'fade-up');
-            outputDiv.appendChild(resultDiv);
-            AOS.refresh();
-            return;
-        }
+  function processPage(i) {
 
-        const page = inputString[i];
-        const frameDivs = document.createElement('div');
-        frameDivs.setAttribute('data-aos', 'fade-left');
-        frameDivs.setAttribute('data-aos-delay', i * 200);
+      // If the calculate is done, show the result
+      if (i >= inputString.length) {
+          const resultDiv = document.createElement('div');
+          resultDiv.textContent = `Total Page Faults: ${pageFaults}`;
+          resultDiv.setAttribute('data-aos', 'fade-up');
+          outputDiv.appendChild(resultDiv);
+          AOS.refresh();
+          return;
+      }
 
-        const currentPageDiv = document.createElement('div');
-        currentPageDiv.className = 'current-page';
-        currentPageDiv.textContent = `Checking: ${page}`;
-        frameDivs.appendChild(currentPageDiv);
+      // Get the current frame div
+      const page = inputString[i];
+      const frameDivs = document.createElement('div');
+      frameDivs.setAttribute('data-aos', 'fade-left');
+      frameDivs.setAttribute('data-aos-delay', i * 200);
 
-        if (!frames.includes(page)) {
-            if (frames.length < frameCount) {
-                frames.push(page);
-                secondChance.push(0);
-            } else {
-                while (secondChance[pointer] === 1) {
-                    secondChance[pointer] = 0;
-                    pointer = (pointer + 1) % frameCount;
-                }
-                frames[pointer] = page;
-                secondChance[pointer] = 0;
-                pointer = (pointer + 1) % frameCount;
-            }
-            pageFaults++;
-            addFrameDivs(frameDivs, frames, 'miss', secondChance);
-        } else {
-            secondChance[frames.indexOf(page)] = 1;
-            addFrameDivs(frameDivs, frames, 'hit', secondChance);
-        }
-        outputDiv.appendChild(frameDivs);
+      // Create the current page div
+      const currentPageDiv = document.createElement('div');
+      currentPageDiv.className = 'current-page';
+      currentPageDiv.textContent = `Checking: ${page}`;
+      frameDivs.appendChild(currentPageDiv);
 
-        setTimeout(() => processPage(i + 1), 1000);
-    }
+      // Check if the page is in the frames
+      if (!frames.includes(page)) {
+          if (frames.length < frameCount) { // If the frames are not full
+              frames.push(page);
+              secondChance.push(0);
+          } else { // If the frames are full
+              while (secondChance[pointer] === 1) { // If the page has a second chance
+                  secondChance[pointer] = 0; // Remove the second chance
+                  pointer = (pointer + 1) % frameCount; // Move the pointer
+              }
+              frames[pointer] = page; // Replace the frame
+              secondChance[pointer] = 0; // Remove the second chance
+              pointer = (pointer + 1) % frameCount; // Move the pointer
+          }
+          pageFaults++;
+          addFrameDivs(frameDivs, frames, 'miss', secondChance); // Add the frames to the output with miss status
+      } else {
+          secondChance[frames.indexOf(page)] = 1; // Give the page a second chance
+          addFrameDivs(frameDivs, frames, 'hit', secondChance); // Add the frames to the output with hit status
+      }
+      outputDiv.appendChild(frameDivs);
 
-    processPage(0);
+      setTimeout(() => processPage(i + 1), 1000); // Process the next page
+  }
+
+  processPage(0);
 }
 
-function addFrameDivs(frameDivs, frames, status, secondChance = []) {
+function addFrameDivs(frameDivs, frames, status, secondChance = []) { // Add the frames to the output
     frames.forEach((frame, index) => {
         const frameDiv = document.createElement('div');
         frameDiv.className = `frame ${status}`;

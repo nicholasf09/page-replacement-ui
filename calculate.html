@@ -39,21 +39,22 @@
             </div>
         </div>
     </div>
-    <div class="cards-answer" id="cards-answer">
-        <svg viewBox="0 0 100% 100%" xmlns='http://www.w3.org/2000/svg' class="noise">
-            <filter id='noiseFilter'>
-                <feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='6' stitchTiles='stitch' />
-            </filter>
-            <rect width='100%' height='100%' preserveAspectRatio="xMidYMid meet" filter='url(#noiseFilter)' />
-        </svg>
-        <div class="content outputs">
-            <div class="output-section">
-                <div id="output"></div>
-            </div>
-        </div>
+    <div id="answer-container">
+      <div class="cards-answer" id="cards-answer">
         <div id="anchor"></div>
+          <svg viewBox="0 0 100% 100%" xmlns='http://www.w3.org/2000/svg' class="noise">
+              <filter id='noiseFilter'>
+                  <feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='6' stitchTiles='stitch' />
+              </filter>
+              <rect width='100%' height='100%' preserveAspectRatio="xMidYMid meet" filter='url(#noiseFilter)' />
+          </svg>
+          <div class="content outputs">
+              <div class="output-section">
+                  <div id="output"></div>
+              </div>
+          </div>
+      </div>
     </div>
-    <p class="text-center mt-4 credit">© 2024 Nicholas Fransisco</p>
     <div class="gradient-bg">
         <svg viewBox="0 0 100vw 100vw" xmlns='http://www.w3.org/2000/svg' class="noiseBg">
             <filter id='noiseFilterBg'>
@@ -81,104 +82,131 @@
     </div>
     <script>
         function FIFO() {
-            const inputString = document.getElementById('inputString').value;
-            const frameCount = parseInt(document.getElementById('frameCount').value);
-            const outputDiv = document.getElementById('output');
-            outputDiv.innerHTML = '';
-
-            let frames = [];
-            let pageFaults = 0;
-
-            for (let i = 0; i < inputString.length; i++) {
-                const page = inputString[i];
-                const frameDivs = document.createElement('div');
-                frameDivs.setAttribute('data-aos', 'fade-left'); 
-                frameDivs.setAttribute('data-aos-delay', i * 200); 
-
-                if (!frames.includes(page)) {
-                    if (frames.length < frameCount) {
-                        frames.push(page);
-                    } else {
-                        frames.shift();
-                        frames.push(page);
-                    }
-                    pageFaults++;
-                    addFrameDivs(frameDivs, frames, 'miss');
-                } else {
-                    addFrameDivs(frameDivs, frames, 'hit');
-                }
-                outputDiv.appendChild(frameDivs);
-            }
-
-            document.getElementById("cards-answer").style.display = "block";
+          document.getElementById("cards-answer").style.display = "block";
+            document.getElementById("answer-container").style.display = "block";
             document.getElementById("anchor").scrollIntoView();
+    const inputString = document.getElementById('inputString').value;
+    const frameCount = parseInt(document.getElementById('frameCount').value);
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = '';
 
+    let frames = [];
+    let pageFaults = 0;
+
+    function processPage(i) {
+        if (i >= inputString.length) {
             const resultDiv = document.createElement('div');
             resultDiv.textContent = `Total Page Faults: ${pageFaults}`;
-            resultDiv.setAttribute('data-aos', 'fade-up'); 
+            resultDiv.setAttribute('data-aos', 'fade-up');
             outputDiv.appendChild(resultDiv);
-
-            AOS.refresh(); 
-        }
-
-        function SecondChance() {
-            const inputString = document.getElementById('inputString').value;
-            const frameCount = parseInt(document.getElementById('frameCount').value);
-            const outputDiv = document.getElementById('output');
-            outputDiv.innerHTML = '';
-
-            let frames = [];
-            let secondChance = [];
-            let pageFaults = 0;
-            let pointer = 0;
-
-            for (let i = 0; i < inputString.length; i++) {
-                const page = inputString[i];
-                const frameDivs = document.createElement('div');
-                frameDivs.setAttribute('data-aos', 'fade-left'); 
-                frameDivs.setAttribute('data-aos-delay', i * 200); 
-
-                if (!frames.includes(page)) {
-                    if (frames.length < frameCount) {
-                        frames.push(page);
-                        secondChance.push(0);
-                    } else {
-                        while (secondChance[pointer] === 1) {
-                            secondChance[pointer] = 0;
-                            pointer = (pointer + 1) % frameCount;
-                        }
-                        frames[pointer] = page;
-                        secondChance[pointer] = 0;
-                        pointer = (pointer + 1) % frameCount;
-                    }
-                    pageFaults++;
-                    addFrameDivs(frameDivs, frames, 'miss');
-                } else {
-                    secondChance[frames.indexOf(page)] = 1;
-                    addFrameDivs(frameDivs, frames, 'hit');
-                }
-                outputDiv.appendChild(frameDivs);
-            }
-
-            document.getElementById("cards-answer").style.display = "block";
-            document.getElementById("anchor").scrollIntoView();
-
-            const resultDiv = document.createElement('div');
-            resultDiv.textContent = `Total Page Faults: ${pageFaults}`;
-            resultDiv.setAttribute('data-aos', 'fade-up'); 
-            outputDiv.appendChild(resultDiv);
-
             AOS.refresh();
+            return;
         }
 
-        function addFrameDivs(frameDivs, frames, status) {
-            frames.forEach(frame => {
-                const frameDiv = document.createElement('div');
-                frameDiv.className = `frame ${status}`;
-                frameDiv.textContent = frame;
-                frameDivs.appendChild(frameDiv);
-            });
+        const page = inputString[i];
+        const frameDivs = document.createElement('div');
+        frameDivs.setAttribute('data-aos', 'fade-left');
+        frameDivs.setAttribute('data-aos-delay', i * 200);
+
+        const currentPageDiv = document.createElement('div');
+        currentPageDiv.className = 'current-page';
+        currentPageDiv.textContent = `Checking: ${page}`;
+        frameDivs.appendChild(currentPageDiv);
+
+        if (!frames.includes(page)) {
+            if (frames.length < frameCount) {
+                frames.push(page);
+            } else {
+                frames.shift();
+                frames.push(page);
+            }
+            pageFaults++;
+            addFrameDivs(frameDivs, frames, 'miss');
+        } else {
+            addFrameDivs(frameDivs, frames, 'hit');
         }
+        outputDiv.appendChild(frameDivs);
+
+        setTimeout(() => processPage(i + 1), 1000);
+    }
+
+    processPage(0);
+}
+
+function SecondChance() {
+  document.getElementById("cards-answer").style.display = "block";
+  document.getElementById("answer-container").style.display = "block";
+  document.getElementById("anchor").scrollIntoView();
+
+    const inputString = document.getElementById('inputString').value;
+    const frameCount = parseInt(document.getElementById('frameCount').value);
+    const outputDiv = document.getElementById('output');
+    outputDiv.innerHTML = '';
+
+    let frames = [];
+    let secondChance = [];
+    let pageFaults = 0;
+    let pointer = 0;
+
+    function processPage(i) {
+        if (i >= inputString.length) {
+            const resultDiv = document.createElement('div');
+            resultDiv.textContent = `Total Page Faults: ${pageFaults}`;
+            resultDiv.setAttribute('data-aos', 'fade-up');
+            outputDiv.appendChild(resultDiv);
+            AOS.refresh();
+            return;
+        }
+
+        const page = inputString[i];
+        const frameDivs = document.createElement('div');
+        frameDivs.setAttribute('data-aos', 'fade-left');
+        frameDivs.setAttribute('data-aos-delay', i * 200);
+
+        const currentPageDiv = document.createElement('div');
+        currentPageDiv.className = 'current-page';
+        currentPageDiv.textContent = `Checking: ${page}`;
+        frameDivs.appendChild(currentPageDiv);
+
+        if (!frames.includes(page)) {
+            if (frames.length < frameCount) {
+                frames.push(page);
+                secondChance.push(0);
+            } else {
+                while (secondChance[pointer] === 1) {
+                    secondChance[pointer] = 0;
+                    pointer = (pointer + 1) % frameCount;
+                }
+                frames[pointer] = page;
+                secondChance[pointer] = 0;
+                pointer = (pointer + 1) % frameCount;
+            }
+            pageFaults++;
+            addFrameDivs(frameDivs, frames, 'miss', secondChance);
+        } else {
+            secondChance[frames.indexOf(page)] = 1;
+            addFrameDivs(frameDivs, frames, 'hit', secondChance);
+        }
+        outputDiv.appendChild(frameDivs);
+
+        setTimeout(() => processPage(i + 1), 1000);
+    }
+
+    processPage(0);
+}
+
+function addFrameDivs(frameDivs, frames, status, secondChance = []) {
+    frames.forEach((frame, index) => {
+        const frameDiv = document.createElement('div');
+        frameDiv.className = `frame ${status}`;
+        frameDiv.textContent = frame;
+        if (secondChance.length > 0 && secondChance[index] === 1) {
+            frameDiv.style.border = '2px solid yellow';
+        }
+        frameDivs.appendChild(frameDiv);
+    });
+}
+
     </script>
 </body>
 </html>

@@ -88,7 +88,7 @@
         document.getElementById("anchor").scrollIntoView();
 
         // Get the input values
-        const inputString = document.getElementById('inputString').value;
+        const inputString = document.getElementById('inputString').value.trim().split(' ');
         const frameCount = parseInt(document.getElementById('frameCount').value);
         const outputDiv = document.getElementById('output');
         outputDiv.innerHTML = '';
@@ -102,7 +102,7 @@
           if (i >= inputString.length) {
               const resultDiv = document.createElement('div');
               resultDiv.textContent = `Total Page Faults: ${pageFaults}`;
-              resultDiv.setAttribute('data-aos', 'fade-up');
+              resultDiv.setAttribute('data-aos', 'fade-up');    
               outputDiv.appendChild(resultDiv);
               AOS.refresh();
               return;
@@ -149,7 +149,7 @@ function SecondChance() {
   document.getElementById("anchor").scrollIntoView();
 
   // Get the input values
-  const inputString = document.getElementById('inputString').value;
+  const inputString = document.getElementById('inputString').value.trim().split(' ');
   const frameCount = parseInt(document.getElementById('frameCount').value);
   const outputDiv = document.getElementById('output');
   outputDiv.innerHTML = '';
